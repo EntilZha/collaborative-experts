@@ -171,6 +171,10 @@ def evaluation(config, logger=None, trainer=None):
             output = model(**valid)
 
         sims = output["cross_view_conf_matrix"].data.cpu().float().numpy()
+        if config._args.save_sim_path != None:
+            np.save(Path(config._args.save_sim_path) / "sims.npy", sims)
+            with open(Path(config._args.save_sim_path) / "meta.pkl", 'wb') as f:
+                pickle.dump(meta, f)
         dataset = data_loaders.dataset_name
         if challenge_mode:
             split = data_loaders.dataloaders["dataset"].split_name
@@ -184,6 +188,7 @@ def evaluation(config, logger=None, trainer=None):
             print(challenge_msg)
             return
 
+        #import ipdb; ipdb.set_trace()
         nested_metrics = {}
         for metric in metrics:
             metric_name = metric.__name__
@@ -220,6 +225,7 @@ if __name__ == '__main__':
     args.add_argument('--eval_from_training_config', action="store_true",
                       help="if true, evaluate directly from a training config file.")
     args.add_argument("--custom_args", help="qualified key,val pairs")
+    args.add_argument("--save_sim_path", help='Path to save similarity matrix', default=None, type=str)
     eval_config = ConfigParser(args)
 
     cfg_msg = "For evaluation, a model checkpoint must be specified via the --resume flag"

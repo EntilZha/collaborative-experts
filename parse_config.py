@@ -34,6 +34,8 @@ class ConfigParser:
 
         if args.device:
             os.environ["CUDA_VISIBLE_DEVICES"] = args.device
+        
+        self.save_sim_path = args.save_sim_path
 
         if args.resume and not slave_mode:
             self.resume = Path(args.resume)
